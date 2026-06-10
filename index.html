@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Astra AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">Astra AI</span>
+    </div>
+    <button class="btn-icon" onclick="closeSidebar()" title="Tutup">✕</button>
+  </div>
+
+  <button class="new-chat-btn" onclick="newChat()">
+    <span>＋</span> Chat Baru
+  </button>
+
+  <div class="chat-list" id="chatList"></div>
+
+  <div class="sidebar-footer">
+    <div class="token-badge">
+      <span>Token sesi ini</span>
+      <span class="token-val" id="tokenCount">0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="btn-icon menu-toggle" onclick="toggleSidebar()" id="menuToggle">☰</button>
+      <div class="persona-strip" id="personaStrip"></div>
+    </div>
+    <select class="format-sel" id="formatSel" title="Format jawaban">
+      <option value="default">📝 Normal</option>
+      <option value="singkat">⚡ Singkat</option>
+      <option value="detail">📖 Detail</option>
+      <option value="bullet">• Poin-poin</option>
+      <option value="dosen">🎓 Seperti Dosen</option>
+    </select>
+    <div class="topbar-actions">
+      <button class="btn-icon" onclick="toggleBookmarks()" title="Bookmark" id="bkToggleBtn">🔖</button>
+      <button class="btn-icon" onclick="exportChat()" title="Export">⬇</button>
+      <button class="btn-icon" onclick="clearChat()" title="Hapus chat">🗑</button>
+    </div>
+  </div>
+
+  <!-- PDF STRIP -->
+  <div id="pdf-strip">
+    <div class="pdf-card">
+      <span style="font-size:18px">📄</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pdf-name">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="pdf-meta">—</div>
+      </div>
+      <div class="pdf-badge">✓ Terbaca</div>
+      <button class="btn-icon" onclick="removePDF()">✕</button>
+    </div>
+  </div>
+
+  <!-- IMAGE STRIP -->
+  <div id="img-strip">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img id="imgPreviewThumb" class="img-preview" src="" alt="">
+      <div style="flex:1">
+        <div style="font-size:12.5px;color:var(--text)" id="imgFileName">—</div>
+        <div style="font-size:11px;color:var(--muted)">Gambar akan disertakan ke pesan</div>
+      </div>
+      <button class="btn-icon" onclick="removeImage()">✕</button>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div id="chat-area">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">Halo! Saya Astra</div>
+      <div class="empty-desc">Asisten AI untuk tugas, koding, analisis PDF &amp; gambar.</div>
+      <div class="suggestions">
+        <button class="suggestion-btn" onclick="useSuggestion(this)">
+          <div class="suggestion-icon">💻</div>
+          <div class="suggestion-text">Buatkan fungsi Python untuk sorting data</div>
+        </button>
+        <button class="suggestion-btn" onclick="useSuggestion(this)">
+          <div class="suggestion-icon">🌐</div>
+          <div class="suggestion-text">Buat landing page HTML yang keren</div>
+        </button>
+        <button class="suggestion-btn" onclick="useSuggestion(this)">
+          <div class="suggestion-icon">📐</div>
+          <div class="suggestion-text">Jelaskan turunan matematika</div>
+        </button>
+        <button class="suggestion-btn" onclick="useSuggestion(this)">
+          <div class="suggestion-icon">📝</div>
+          <div class="suggestion-text">Bantu saya buat esai tentang AI</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-row">
+      <div class="input-wrap">
+        <textarea id="msg-input" placeholder="Ketik pertanyaan atau tugas kamu..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="input-actions">
+          <button class="ia-btn" onclick="document.getElementById('pdf-input').click()" title="Upload PDF">📎</button>
+          <button class="ia-btn" onclick="document.getElementById('img-input').click()" title="Upload Gambar">🖼</button>
+        </div>
+      </div>
+      <button id="send-btn" onclick="sendMessage()" title="Kirim">➤</button>
+    </div>
+    <div class="input-hint">Enter kirim · Shift+Enter baris baru · 📎 PDF · 🖼 Gambar</div>
+  </div>
+</div>
+
+<!-- ══════════════ BOOKMARKS PANEL ══════════════ -->
+<div class="bookmarks-panel" id="bookmarksPanel">
+  <div class="bk-head">
+    🔖 Tersimpan
+    <button class="btn-icon" onclick="toggleBookmarks()">✕</button>
+  </div>
+  <div class="bk-list" id="bkList"></div>
+</div>
+
+</div><!-- end shell -->
+
+<!-- TRANSLATE POPUP -->
+<div class="translate-popup" id="translatePopup">
+  <div class="tl-opt" onclick="doTranslate('Inggris')">🇬🇧 Inggris</div>
+  <div class="tl-opt" onclick="doTranslate('Jawa')">🇮🇩 Bahasa Jawa</div>
+  <div class="tl-opt" onclick="doTranslate('Arab')">🇸🇦 Arab</div>
+  <div class="tl-opt" onclick="doTranslate('Jepang')">🇯🇵 Jepang</div>
+  <div class="tl-opt" onclick="doTranslate('Spanyol')">🇪🇸 Spanyol</div>
+  <div class="tl-opt" onclick="doTranslate('Prancis')">🇫🇷 Prancis</div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div class="modal-bg" id="imgModal" onclick="document.getElementById('imgModal').classList.remove('open')">
+  <img class="modal-img" id="modalImg" src="" alt="">
+</div>
+
+<!-- HIDDEN INPUTS -->
+<input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handlePDFUpload(event)"/>
+<input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImageUpload(event)"/>
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
